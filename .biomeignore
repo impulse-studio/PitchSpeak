@@ -1,0 +1,47 @@
+# Package manager files
+pnpm-lock.yaml
+pnpm-workspace.yaml
+package-lock.json
+package.json
+
+# Translation files (generated)
+.translations
+
+# Build outputs & generated files
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env*
+!.env.example
+
+# System files
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime directories
+.vercel/
+.trigger/
+
+# Database
+*.db
+*.sqlite
+
+# Coverage reports
+coverage/
