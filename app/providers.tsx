@@ -7,12 +7,12 @@ import { Provider as TooltipProvider } from "@/components/ui/tooltip";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-      <ThemeProvider attribute="class">
-        <NuqsAdapter>
-          <TooltipProvider>{children}</TooltipProvider>
-        </NuqsAdapter>
-        <NotificationProvider />
-        <Toaster position="top-center" richColors />
-      </ThemeProvider>
+    <ThemeProvider attribute="class">
+      <NuqsAdapter>
+        <TooltipProvider>{children}</TooltipProvider>
+      </NuqsAdapter>
+      <NotificationProvider />
+      <Toaster position="top-center" richColors />
+    </ThemeProvider>
   );
 }

@@ -1,48 +1,79 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
-    "extends": ["ultracite"],
-    "vcs": {
-      "enabled": true,
-      "clientKind": "git",
-      "useIgnoreFile": true
-    },
-    "files": {
-      "ignoreUnknown": true
-    },
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "experimentalScannerIgnores": [
+      "node_modules",
+      "dist",
+      "build",
+      ".next",
+      ".vercel"
+    ],
+    "includes": [
+      "app/**/*.{ts,tsx,js,jsx}",
+      "components/**/*.{ts,tsx,js,jsx}",
+      "server/**/*.{ts,tsx,js,jsx}",
+      "db/**/*.{ts,tsx,js,jsx}",
+      "*.{ts,tsx,js,jsx}",
+      "migrations/**/*.{json,sql}"
+    ]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80
+  },
+  "javascript": {
     "formatter": {
-      "indentStyle": "space",
-      "indentWidth": 2,
-      "lineWidth": 80
-    },
-    "javascript": {
-      "formatter": {
-        "quoteStyle": "double",
-        "trailingCommas": "es5",
-        "semicolons": "always",
-        "bracketSpacing": true,
-        "arrowParentheses": "always"
-      }
-    },
-    "linter": {
-      "rules": {
-        "performance": {
-          "noNamespaceImport": "off",
-          "noImgElement": "off"
+      "quoteStyle": "double",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "bracketSpacing": true,
+      "arrowParentheses": "always"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "performance": {
+        "noNamespaceImport": "off",
+        "noImgElement": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["warn", "error", "info", "debug", "trace"]
+          }
         },
-        "suspicious": {
-          "noExplicitAny": "error",
-          "noConsole": {
-            "level": "error",
-            "options": {
-              "allow": ["warn", "error", "info", "debug", "trace"]
-            }
-          },
-          "noArrayIndexKey": "off"
-        },
-        "nursery": {
-          "noUnknownAtRule": "off",
-          "noShadow": "off"
-        }
+        "noArrayIndexKey": "off"
+      },
+      "nursery": {
+        "noUnknownAtRule": "off",
+        "noShadow": "off",
+        "useJsonImportAttribute": "off"
+      },
+      "style": {
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
+      },
+      "a11y": {
+        "useSemanticElements": "off"
       }
     }
   }
+}
