@@ -6,6 +6,7 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
     RESEND_FROM_EMAIL: z.string().min(1),
+    SITE_URL: z.string().url(),
 
     NODE_ENV: z.enum(["development", "production"]).optional(),
     VERCEL_URL: z.string().optional(),
@@ -14,10 +15,14 @@ export const env = createEnv({
     VERCEL_ENV: z.enum(["development", "production", "preview"]).optional(),
   },
   client: {
+    NEXT_PUBLIC_CONVEX_URL: z.string().url(),
+    NEXT_PUBLIC_CONVEX_SITE_URL: z.string().url(),
     NEXT_PUBLIC_REACT_QUERY_DEVTOOLS: z.enum(["true", "false"]).optional(),
     NEXT_PUBLIC_REACT_SCAN_DEVTOOLS: z.enum(["true", "false"]).optional(),
   },
   experimental__runtimeEnv: {
+    NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+    NEXT_PUBLIC_CONVEX_SITE_URL: process.env.NEXT_PUBLIC_CONVEX_SITE_URL,
     NEXT_PUBLIC_REACT_QUERY_DEVTOOLS:
       process.env.NEXT_PUBLIC_REACT_QUERY_DEVTOOLS,
     NEXT_PUBLIC_REACT_SCAN_DEVTOOLS:

@@ -7,6 +7,7 @@ import {
   RiMailLine,
   RiUserAddFill,
   RiUserLine,
+  RiGithubFill,
 } from "@remixicon/react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -17,7 +18,6 @@ import { useForm } from "react-hook-form";
 import type { z } from "zod";
 
 import { PasswordInput } from "@/app/(auth)/_components/password-input";
-import sendVerificationOtp from "@/app/(auth)/_lib/send-verification-otp";
 import { StaggeredFadeLoader } from "@/components/common/staggered-fade-loader";
 import * as Divider from "@/components/ui/divider";
 import * as FancyButton from "@/components/ui/fancy-button";
@@ -25,19 +25,20 @@ import { FormGlobalMessage, FormMessage } from "@/components/ui/form";
 import * as Input from "@/components/ui/input";
 import * as Label from "@/components/ui/label";
 import * as LinkButton from "@/components/ui/link-button";
+import * as SocialButton from "@/components/ui/social-button";
 import { AUTH_ERRORS } from "@/constants/auth-errors";
+import { PAGES } from "@/constants/pages";
 import { PROJECT } from "@/constants/project";
 import { authClient } from "@/lib/auth/client";
 import { cn } from "@/lib/utils/cn";
 import { signUpSchema } from "@/validators/auth";
-
 import { signUpParsers } from "../search-params";
 
 export function SignUpForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [{ signUpEmail }] = useQueryStates(signUpParsers);
+  const [{ signUpEmail, callbackUrl}] = useQueryStates(signUpParsers);
 
   const { register, handleSubmit, formState } = useForm({
     resolver: zodResolver(signUpSchema),
@@ -72,14 +73,7 @@ export function SignUpForm() {
           setIsLoading(false);
         },
         onSuccess: () => {
-          sendVerificationOtp(values.email)
-            .then((redirectUrl) => {
-              router.push(redirectUrl);
-            })
-            .catch((error) => {
-              setIsLoading(false);
-              setError(error as string);
-            });
+          router.push(`${PAGES.VERIFICATION}?email=${values.email}`);
         },
       }
     );
@@ -119,9 +113,22 @@ export function SignUpForm() {
             </div>
           </div>
 
-          <div>
-            <Divider.Root />
-          </div>
+          <SocialButton.Root
+            brand="github"
+            className="w-full"
+            mode="stroke"
+            onClick={() =>
+              authClient.signIn.social({
+                provider: "github",
+                callbackURL: callbackUrl || PAGES.LANDING_PAGE,
+              })
+            }
+          >
+            <SocialButton.Icon as={RiGithubFill} />
+            Continue with GitHub
+          </SocialButton.Root>
+
+          <Divider.Root variant="line-text">OR</Divider.Root>
 
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
