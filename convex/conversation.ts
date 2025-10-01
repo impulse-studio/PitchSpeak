@@ -41,7 +41,7 @@ export const summarizeConversation = action({
 
     // Generate the summary using AI SDK v5
     const { text } = await generateText({
-      model: openai("gpt-4o"),
+      model: openai("gpt-5-mini"),
       prompt: `Analyze this conversation between a user and an AI assistant about a project.
 
 Conversation:

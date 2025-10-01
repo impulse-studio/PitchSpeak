@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
-
-interface Transcript {
-  role: "user" | "assistant";
-  text: string;
-  timestamp: number;
-}
+import type { Transcript } from "@/types/transcript";
 
 interface ConversationSummary {
   projectSummary: string;

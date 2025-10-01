@@ -2,12 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Vapi from "@vapi-ai/web";
-
-interface Transcript {
-  role: "user" | "assistant";
-  text: string;
-  timestamp: number;
-}
+import type { Transcript } from "@/types/transcript";
 
 interface UseVapiOptions {
   assistantId?: string;
