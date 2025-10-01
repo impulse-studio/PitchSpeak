@@ -7,6 +7,7 @@ import {
   RiErrorWarningFill,
   RiMailLine,
   RiUserFill,
+  RiGithubFill,
 } from "@remixicon/react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -25,6 +26,7 @@ import { FormGlobalMessage, FormMessage } from "@/components/ui/form";
 import * as Input from "@/components/ui/input";
 import * as Label from "@/components/ui/label";
 import * as LinkButton from "@/components/ui/link-button";
+import * as SocialButton from "@/components/ui/social-button";
 import { AUTH_ERRORS } from "@/constants/auth-errors";
 import { PAGES } from "@/constants/pages";
 import { PROJECT } from "@/constants/project";
@@ -42,7 +44,8 @@ export const signInSchema = z.object({
 
 export function SignInForm() {
   const router = useRouter();
-  const [{ message, error: errorQuery }] = useQueryStates(messageParsers);
+  const [{ message, error: errorQuery, callbackUrl }] =
+    useQueryStates(messageParsers);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(errorQuery);
@@ -64,7 +67,7 @@ export function SignInForm() {
       {
         email: values.email,
         password: values.password,
-        callbackURL: PAGES.DASHBOARD,
+        callbackURL: PAGES.LANDING_PAGE,
         rememberMe: values.rememberMe,
       },
       {
@@ -127,9 +130,22 @@ export function SignInForm() {
             </div>
           </div>
 
-          <div>
-            <Divider.Root />
-          </div>
+          <SocialButton.Root
+            brand="github"
+            className="w-full"
+            mode="stroke"
+            onClick={() =>
+              authClient.signIn.social({
+                provider: "github",
+                callbackURL: callbackUrl || PAGES.LANDING_PAGE,
+              })
+            }
+          >
+            <SocialButton.Icon as={RiGithubFill} />
+            Continue with GitHub
+          </SocialButton.Root>
+
+          <Divider.Root variant="line-text">OR</Divider.Root>
 
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">

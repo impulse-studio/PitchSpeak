@@ -66,7 +66,7 @@ export function VerificationForm() {
             setIsLoading(false);
           },
           onSuccess: () => {
-            router.push(PAGES.DASHBOARD);
+            router.push(PAGES.LANDING_PAGE);
           },
         }
       );

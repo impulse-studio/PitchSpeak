@@ -387,11 +387,9 @@ body {
 }
 
 .keyboard-nav-active tr:hover td {
-  /* biome-ignore lint/nursery/noImportantStyles: Overriding important styles */
   background-color: transparent !important;
 }
 
 .keyboard-nav-active [class*="group-hover"]:hover {
-  /* biome-ignore lint/nursery/noImportantStyles: Overriding important styles */
   background-color: transparent !important;
 }
