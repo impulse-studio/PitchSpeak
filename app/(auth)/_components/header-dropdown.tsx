@@ -8,7 +8,6 @@ import * as DropdownMenu from "@/components/ui/dropdown";
 import { authClient } from "@/lib/auth/client";
 
 export function HeaderDropdown({ user }: { user: User }) {
-  
   const getInitials = useCallback((name: string) => {
     return name
       .split(" ")

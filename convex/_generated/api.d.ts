@@ -9,6 +9,8 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as conversation from "../conversation.js";
+import type * as conversationQueries from "../conversationQueries.js";
 import type * as email from "../email.js";
 import type * as emailTemplate from "../emailTemplate.js";
 import type * as emails_changeEmail from "../emails/changeEmail.js";
@@ -41,6 +43,8 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  conversation: typeof conversation;
+  conversationQueries: typeof conversationQueries;
   email: typeof email;
   emailTemplate: typeof emailTemplate;
   "emails/changeEmail": typeof emails_changeEmail;

@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, MicOff, X } from "lucide-react";
+import { Mic, MicOff, Phone } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import Footer from "@/app/(auth)/_components/footer";
@@ -15,7 +15,9 @@ interface ConversationInterfaceProps {
   isResponding: boolean;
   audioLevel: number;
   isInConversation: boolean;
+  isConnecting: boolean;
   showEndConversationDialog: boolean;
+  isSaving: boolean;
   onToggleListening: () => void;
   onEndConversation: () => void;
   onContinueConversation: () => void;
@@ -24,9 +26,10 @@ interface ConversationInterfaceProps {
 export default function ConversationInterface({
   isListening,
   isResponding,
-  audioLevel,
   isInConversation,
+  isConnecting,
   showEndConversationDialog,
+  isSaving,
   onToggleListening,
   onEndConversation,
   onContinueConversation,
@@ -39,7 +42,6 @@ export default function ConversationInterface({
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
 
-      // Hide microphone when scrolled near the bottom (within 200px of footer)
       const isNearBottom = scrollY + windowHeight >= documentHeight - 800;
       setShowMicrophone(!isNearBottom);
     };
@@ -47,9 +49,26 @@ export default function ConversationInterface({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    let audio: HTMLAudioElement | null = null;
+
+    if (isConnecting) {
+      audio = new Audio("/sounds/phone-call.wav");
+      audio.loop = true;
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    }
+
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, [isConnecting]);
   return (
     <div className="min-h-screen bg-black text-foreground relative overflow-hidden">
-      {/* Grid background pattern */}
       <div
         className="absolute inset-0 opacity-10"
         style={{
@@ -60,31 +79,21 @@ export default function ConversationInterface({
           backgroundSize: "50px 50px",
         }}
       />
-      {/* Subtle radial gradient overlay */}
       <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/50" />
 
-      {/* Background pulse effect */}
-      <BackgroundPulse
-        isListening={isListening}
-        isResponding={isResponding}
-        spherePosition={{ x: 0.5, y: 0.65 }}
-      />
+      {!isInConversation && (
+        <BackgroundPulse
+          isListening={isListening}
+          isResponding={isResponding}
+          isInConversation={isInConversation}
+          spherePosition={{ x: 0.5, y: 0.65 }}
+        />
+      )}
 
-      <div
-        className={`transition-opacity duration-500 ease-in-out ${!isListening && !isResponding ? "opacity-100" : "opacity-0"}`}
-      >
-        <Header />
-      </div>
-
-      {isInConversation && (
-        <Button.Root
-          onClick={onEndConversation}
-          size="xsmall"
-          variant="neutral"
-          className="fixed top-8 right-8 z-20 w-12 h-12 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 shadow-2xl shadow-black/50"
-        >
-          <Button.Icon as={X} />
-        </Button.Root>
+      {!isInConversation && (
+        <div className="transition-opacity duration-500 ease-in-out opacity-100">
+          <Header />
+        </div>
       )}
 
       <EndConversationDialog
@@ -117,22 +126,34 @@ export default function ConversationInterface({
             className="relative"
             initial={{ opacity: 0, scale: 0 }}
             animate={{
-              opacity: isListening || isResponding ? 1 : [0, 0.3, 0.8, 1],
-              scale: isListening || isResponding ? 1 : [0, 0.8, 1.1, 1],
-              y: isListening ? -120 : 0,
+              opacity:
+                isListening || isResponding || isInConversation
+                  ? 1
+                  : [0, 0.3, 0.8, 1],
+              scale:
+                isListening || isResponding || isInConversation
+                  ? 1
+                  : [0, 0.8, 1.1, 1],
+              y: isInConversation ? -120 : 0,
               filter: isListening
                 ? "drop-shadow(0 0 30px rgba(34, 197, 94, 0.6)) drop-shadow(0 0 60px rgba(34, 197, 94, 0.3))"
                 : isResponding
                   ? "drop-shadow(0 0 30px rgba(168, 85, 247, 0.6)) drop-shadow(0 0 60px rgba(168, 85, 247, 0.3))"
-                  : "drop-shadow(0 0 15px rgba(99, 102, 241, 0.3))",
+                  : isInConversation
+                    ? "drop-shadow(0 0 20px rgba(120, 110, 200, 0.5))"
+                    : "drop-shadow(0 0 15px rgba(99, 102, 241, 0.3))",
             }}
             transition={{
-              duration: isListening || isResponding ? 0.8 : 2,
-              times: isListening || isResponding ? [0, 1] : [0, 0.3, 0.7, 1],
+              duration:
+                isListening || isResponding || isInConversation ? 0.8 : 2,
+              times:
+                isListening || isResponding || isInConversation
+                  ? [0, 1]
+                  : [0, 0.3, 0.7, 1],
               ease: "easeOut",
-              delay: isListening || isResponding ? 0 : 0.3,
+              delay: isListening || isResponding || isInConversation ? 0 : 0.3,
               y: {
-                duration: isListening ? 1.2 : 0.8,
+                duration: isInConversation ? 1.2 : 0.8,
                 ease: [0.4, 0, 0.2, 1],
                 delay: 0,
               },
@@ -145,7 +166,7 @@ export default function ConversationInterface({
             <VoxelSphere
               isListening={isListening}
               isResponding={isResponding}
-              audioLevel={audioLevel}
+              isConnected={isInConversation}
             />
           </motion.div>
         </div>
@@ -158,84 +179,102 @@ export default function ConversationInterface({
       >
         <Button.Root
           onClick={onToggleListening}
+          disabled={isSaving}
           size="xsmall"
-          className="rounded-full h-14 w-14 transition-all duration-300 backdrop-blur-2xl relative overflow-hidden hover:scale-105 active:scale-95"
+          className="rounded-full h-14 w-14 transition-all duration-300 backdrop-blur-2xl relative overflow-hidden hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            background: isListening
-              ? `linear-gradient(135deg,
-                  rgba(0, 0, 0, 0.1) 0%,
-                  rgba(239, 68, 68, 0.05) 20%,
-                  rgba(0, 0, 0, 0.3) 60%,
-                  rgba(0, 0, 0, 0.8) 100%),
-                 radial-gradient(circle at 30% 20%,
-                  rgba(255, 255, 255, 0.2) 0%,
-                  transparent 50%)`
-              : isResponding
+            background: isInConversation
+              ? isListening
                 ? `linear-gradient(135deg,
-                    rgba(255, 255, 255, 0.05) 0%,
-                    rgba(0, 0, 0, 0.2) 40%,
-                    rgba(0, 0, 0, 0.6) 100%)`
-                : `linear-gradient(135deg,
-                    rgba(255, 255, 255, 0.1) 0%,
-                    rgba(255, 255, 255, 0.05) 20%,
+                    rgba(0, 0, 0, 0.1) 0%,
+                    rgba(239, 68, 68, 0.05) 20%,
                     rgba(0, 0, 0, 0.3) 60%,
                     rgba(0, 0, 0, 0.8) 100%),
                    radial-gradient(circle at 30% 20%,
-                    rgba(255, 255, 255, 0.3) 0%,
-                    transparent 50%)`,
-            border: isListening
+                    rgba(255, 255, 255, 0.2) 0%,
+                    transparent 50%)`
+                : `linear-gradient(135deg,
+                      rgba(239, 68, 68, 0.1) 0%,
+                      rgba(239, 68, 68, 0.05) 20%,
+                      rgba(0, 0, 0, 0.3) 60%,
+                      rgba(0, 0, 0, 0.8) 100%),
+                     radial-gradient(circle at 30% 20%,
+                      rgba(239, 68, 68, 0.2) 0%,
+                      transparent 50%)`
+              : `linear-gradient(135deg,
+                  rgba(255, 255, 255, 0.1) 0%,
+                  rgba(255, 255, 255, 0.05) 20%,
+                  rgba(0, 0, 0, 0.3) 60%,
+                  rgba(0, 0, 0, 0.8) 100%),
+                 radial-gradient(circle at 30% 20%,
+                  rgba(255, 255, 255, 0.3) 0%,
+                  transparent 50%)`,
+            border: isInConversation
               ? "1px solid rgba(239, 68, 68, 0.3)"
-              : isResponding
-                ? "1px solid rgba(255, 255, 255, 0.1)"
-                : "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: isListening
-              ? `
-                inset 0 1px 2px rgba(255, 255, 255, 0.25),
-                inset 0 -1px 1px rgba(0, 0, 0, 0.6),
-                0 2px 4px rgba(0, 0, 0, 0.9),
-                0 8px 16px rgba(0, 0, 0, 0.8),
-                0 16px 32px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                0 0 20px rgba(239, 68, 68, 0.4),
-                0 0 40px rgba(239, 68, 68, 0.2)
-              `
-              : isResponding
+              : "1px solid rgba(255, 255, 255, 0.2)",
+            boxShadow: isInConversation
+              ? isListening
                 ? `
-                  inset 0 1px 1px rgba(255, 255, 255, 0.1),
-                  inset 0 -1px 1px rgba(0, 0, 0, 0.8),
-                  0 2px 4px rgba(0, 0, 0, 0.9),
-                  0 8px 16px rgba(0, 0, 0, 0.8),
-                  0 16px 32px rgba(0, 0, 0, 0.6),
-                  0 0 0 1px rgba(255, 255, 255, 0.05)
-                `
-                : `
-                  inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.25),
                   inset 0 -1px 1px rgba(0, 0, 0, 0.6),
                   0 2px 4px rgba(0, 0, 0, 0.9),
                   0 8px 16px rgba(0, 0, 0, 0.8),
                   0 16px 32px rgba(0, 0, 0, 0.6),
-                  0 0 0 1px rgba(255, 255, 255, 0.15),
-                  0 0 20px rgba(255, 255, 255, 0.1),
-                  0 0 40px rgba(255, 255, 255, 0.05)
-                `,
-            color: isListening
+                  0 0 0 1px rgba(255, 255, 255, 0.1),
+                  0 0 20px rgba(239, 68, 68, 0.4),
+                  0 0 40px rgba(239, 68, 68, 0.2)
+                `
+                : `
+                  inset 0 1px 2px rgba(255, 255, 255, 0.2),
+                  inset 0 -1px 1px rgba(0, 0, 0, 0.6),
+                  0 2px 4px rgba(0, 0, 0, 0.9),
+                  0 8px 16px rgba(0, 0, 0, 0.8),
+                  0 16px 32px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(239, 68, 68, 0.1),
+                  0 0 20px rgba(239, 68, 68, 0.3),
+                  0 0 40px rgba(239, 68, 68, 0.15)
+                `
+              : `
+                inset 0 1px 2px rgba(255, 255, 255, 0.3),
+                inset 0 -1px 1px rgba(0, 0, 0, 0.6),
+                0 2px 4px rgba(0, 0, 0, 0.9),
+                0 8px 16px rgba(0, 0, 0, 0.8),
+                0 16px 32px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.15),
+                0 0 20px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(255, 255, 255, 0.05)
+              `,
+            color: isInConversation
               ? "rgba(239, 68, 68, 1)"
-              : isResponding
-                ? "rgba(255, 255, 255, 0.4)"
-                : "rgba(255, 255, 255, 0.9)",
-            cursor: isResponding ? "not-allowed" : "pointer",
+              : "rgba(255, 255, 255, 0.9)",
+            cursor: "pointer",
           }}
-          disabled={isResponding}
         >
-          <Button.Icon as={isListening ? MicOff : Mic} />
+          {isConnecting ? (
+            <motion.div
+              animate={{
+                rotate: [0, -15, 15, -15, 15, 0],
+                scale: [1, 1.1, 0.9, 1.1, 0.9, 1],
+              }}
+              transition={{
+                duration: 0.5,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              }}
+            >
+              <Phone className="h-5 w-5" />
+            </motion.div>
+          ) : (
+            <Button.Icon as={isInConversation ? MicOff : Mic} />
+          )}
         </Button.Root>
       </div>
 
-      <div
-        className={`transition-opacity duration-500 ease-in-out ${!isListening && !isResponding ? "opacity-100" : "opacity-0"}`}
-      >
-        <Footer />
-      </div>
+      {!isInConversation && (
+        <div className="transition-opacity duration-500 ease-in-out opacity-100">
+          <Footer />
+        </div>
+      )}
     </div>
   );
 }
