@@ -33,22 +33,10 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/features"
+              href="/summary"
               className="text-white/70 hover:text-white/90 text-sm font-medium tracking-tight transition-colors duration-200"
             >
-              Features
-            </Link>
-            <Link
-              href="/pricing"
-              className="text-white/70 hover:text-white/90 text-sm font-medium tracking-tight transition-colors duration-200"
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/contact"
-              className="text-white/70 hover:text-white/90 text-sm font-medium tracking-tight transition-colors duration-200"
-            >
-              Contact
+              Summary
             </Link>
           </div>
 

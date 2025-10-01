@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   RiErrorWarningFill,
+  RiGithubFill,
   RiInformationFill,
   RiMailLine,
   RiUserAddFill,
   RiUserLine,
-  RiGithubFill,
 } from "@remixicon/react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -38,7 +38,7 @@ export function SignUpForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [{ signUpEmail, callbackUrl}] = useQueryStates(signUpParsers);
+  const [{ signUpEmail, callbackUrl }] = useQueryStates(signUpParsers);
 
   const { register, handleSubmit, formState } = useForm({
     resolver: zodResolver(signUpSchema),

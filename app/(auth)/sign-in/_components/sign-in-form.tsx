@@ -5,9 +5,9 @@ import * as LabelPrimitive from "@radix-ui/react-label";
 import {
   RiCheckboxCircleFill,
   RiErrorWarningFill,
+  RiGithubFill,
   RiMailLine,
   RiUserFill,
-  RiGithubFill,
 } from "@remixicon/react";
 import { motion } from "motion/react";
 import Link from "next/link";

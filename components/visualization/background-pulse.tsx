@@ -5,12 +5,14 @@ import { useEffect, useRef } from "react";
 interface BackgroundPulseProps {
   isListening: boolean;
   isResponding: boolean;
+  isInConversation: boolean;
   spherePosition?: { x: number; y: number };
 }
 
 export default function BackgroundPulse({
   isListening,
   isResponding,
+  isInConversation,
   spherePosition = { x: 0.5, y: 0.5 },
 }: BackgroundPulseProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -45,8 +47,10 @@ export default function BackgroundPulse({
 
     const createPulseWave = () => {
       // Calculate max radius to cover entire screen from sphere position
+      // Adjust Y position when in conversation (same -120px offset as the sphere)
+      const yOffset = isInConversation ? -120 : 0;
       const centerX = window.innerWidth * spherePosition.x;
-      const centerY = window.innerHeight * spherePosition.y;
+      const centerY = window.innerHeight * spherePosition.y + yOffset;
 
       const maxRadius =
         Math.sqrt(
@@ -71,8 +75,9 @@ export default function BackgroundPulse({
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const yOffset = isInConversation ? -120 : 0;
       const centerX = canvas.width * spherePosition.x;
-      const centerY = canvas.height * spherePosition.y;
+      const centerY = canvas.height * spherePosition.y + yOffset;
       time += 0.005;
 
       // Create pulse waves only when idle (at rest)
@@ -168,7 +173,13 @@ export default function BackgroundPulse({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isListening, isResponding, spherePosition.x, spherePosition.y]);
+  }, [
+    isListening,
+    isResponding,
+    isInConversation,
+    spherePosition.x,
+    spherePosition.y,
+  ]);
 
   // Only render when idle
   if (isListening || isResponding) {
