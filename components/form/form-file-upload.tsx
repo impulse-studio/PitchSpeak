@@ -15,9 +15,8 @@ import {
 } from "react-hook-form";
 import { toast } from "sonner";
 import { ulid } from "ulid";
-
+import { StaggeredFadeLoader } from "@/components/common/staggered-fade-loader";
 import { FormField } from "@/components/form/form-field";
-import { StaggeredFadeLoader } from "@/components/staggered-fade-loader";
 import * as Button from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";
 import { cn } from "@/lib/utils/cn";

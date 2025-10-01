@@ -2,7 +2,6 @@
 pnpm-lock.yaml
 pnpm-workspace.yaml
 package-lock.json
-package.json
 
 # Translation files (generated)
 .translations
@@ -45,3 +44,6 @@ yarn-error.log*
 
 # Coverage reports
 coverage/
+
+# Claude config
+.claude/

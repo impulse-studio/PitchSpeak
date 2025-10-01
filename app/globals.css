@@ -184,12 +184,12 @@
     --social-amazon: 210 14.52% 24.31%;
     --social-zendesk: 46.67 25.71% 6.86%;
 
-    --primary-dark: var(--purple-800);
-    --primary-darker: var(--purple-700);
-    --primary-base: var(--purple-500);
-    --primary-alpha-24: var(--purple-alpha-24);
-    --primary-alpha-16: var(--purple-alpha-16);
-    --primary-alpha-10: var(--purple-alpha-10);
+    --primary-dark: var(--blue-800);
+    --primary-darker: var(--blue-700);
+    --primary-base: var(--blue-500);
+    --primary-alpha-24: var(--blue-alpha-24);
+    --primary-alpha-16: var(--blue-alpha-16);
+    --primary-alpha-10: var(--blue-alpha-10);
 
     --static-black: var(--neutral-950);
     --static-white: var(--neutral-0);
@@ -242,10 +242,10 @@
     --away-light: var(--yellow-200);
     --away-lighter: var(--yellow-50);
 
-    --feature-dark: var(--purple-950);
-    --feature-base: var(--purple-500);
-    --feature-light: var(--purple-200);
-    --feature-lighter: var(--purple-50);
+    --feature-dark: var(--blue-950);
+    --feature-base: var(--blue-500);
+    --feature-light: var(--blue-200);
+    --feature-lighter: var(--blue-50);
 
     --verified-dark: var(--sky-950);
     --verified-base: var(--sky-500);
@@ -312,10 +312,10 @@
     --away-light: var(--yellow-alpha-24);
     --away-lighter: var(--yellow-alpha-16);
 
-    --feature-dark: var(--purple-400);
-    --feature-base: var(--purple-500);
-    --feature-light: var(--purple-alpha-24);
-    --feature-lighter: var(--purple-alpha-16);
+    --feature-dark: var(--blue-400);
+    --feature-base: var(--blue-500);
+    --feature-light: var(--blue-alpha-24);
+    --feature-lighter: var(--blue-alpha-16);
 
     --verified-dark: var(--sky-400);
     --verified-base: var(--sky-600);

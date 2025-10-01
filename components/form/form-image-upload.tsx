@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { ulid } from "ulid";
 
-import { StaggeredFadeLoader } from "@/components/staggered-fade-loader";
+import { StaggeredFadeLoader } from "@/components/common/staggered-fade-loader";
 import * as Button from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";
 import { FormMessage } from "@/components/ui/form";

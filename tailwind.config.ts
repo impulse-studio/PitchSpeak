@@ -1,4 +1,6 @@
-import scrollbarHide from "tailwind-scrollbar-hide";
+import tailwindcssTypography from "@tailwindcss/typography";
+import tailwindScrollbarHide from "tailwind-scrollbar-hide";
+
 import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme";
 import tailwindcssAnimate from "tailwindcss-animate";
@@ -214,6 +216,42 @@ export const shadows = {
   "toggle-switch": ["0 6px 10px 0 #0e121b0f", "0 2px 4px 0 #0e121b08"],
   "switch-thumb": ["0 4px 8px 0 #1b1c1d0f", "0 2px 4px 0 #0e121b14"],
   tooltip: ["0 12px 24px 0 #0e121b0f", "0 1px 2px 0 #0e121b08"],
+  "custom-xs": [
+    "0 0 0 1px rgba(51, 51, 51, 0.04)",
+    "0 4px 8px -2px rgba(51, 51, 51, 0.06)",
+    "0 2px 4px rgba(51, 51, 51, 0.04)",
+    "0 1px 2px rgba(51, 51, 51, 0.04)",
+    "inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06)",
+  ],
+  "custom-sm": [
+    "0 0 0 1px rgba(51, 51, 51, 0.04)",
+    "0 16px 8px -8px rgba(51, 51, 51, 0.01)",
+    "0 12px 6px -6px rgba(51, 51, 51, 0.02)",
+    "0 5px 5px -2.5px rgba(51, 51, 51, 0.08)",
+    "0 1px 3px -1.5px rgba(51, 51, 51, 0.16)",
+    "inset 0 -0.5px 0.5px rgba(51, 51, 51, 0.08)",
+  ],
+  "custom-md": [
+    "0 0 0 1px rgba(51, 51, 51, 0.04)",
+    "0 1px 1px 0.5px rgba(51, 51, 51, 0.04)",
+    "0 3px 3px -1.5px rgba(51, 51, 51, 0.02)",
+    "0 6px 6px -3px rgba(51, 51, 51, 0.04)",
+    "0 12px 12px -6px rgba(51, 51, 51, 0.04)",
+    "0 24px 24px -12px rgba(51, 51, 51, 0.04)",
+    "0 48px 48px -24px rgba(51, 51, 51, 0.04)",
+    "inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06)",
+  ],
+  "custom-lg": [
+    "0 0 0 1px rgba(51, 51, 51, 0.04)",
+    "0 1px 1px 0.5px rgba(51, 51, 51, 0.04)",
+    "0 3px 3px -1.5px rgba(51, 51, 51, 0.02)",
+    "0 6px 6px -3px rgba(51, 51, 51, 0.04)",
+    "0 12px 12px -6px rgba(51, 51, 51, 0.04)",
+    "0 24px 24px -12px rgba(51, 51, 51, 0.04)",
+    "0 48px 48px -24px rgba(51, 51, 51, 0.04)",
+    "0 96px 96px -32px rgba(51, 51, 51, 0.06)",
+    "inset 0 -1px 1px -0.5px rgba(51, 51, 51, 0.06)",
+  ],
 } as unknown as Record<string, string>;
 
 export const borderRadii = {
@@ -223,7 +261,69 @@ export const borderRadii = {
 
 const config = {
   darkMode: ["class"],
-  safelist: [".dark"],
+  safelist: [
+    ".dark",
+    // AI Model Colors - Dynamic classes pour les couleurs des modèles
+    "bg-gray-900/20",
+    "text-gray-500",
+    "hover:bg-gray-900/20",
+    "hover:text-gray-500",
+    "bg-gray-300",
+    "bg-bg-soft-200",
+    "text-text-sub-600",
+    "hover:bg-bg-soft-200",
+    "hover:text-text-sub-600",
+    "bg-bg-weak-50",
+    "text-text-sub-600",
+    "hover:bg-bg-weak-50",
+    "hover:text-text-sub-600",
+    "bg-bg-white-0",
+    "bg-green-900/20",
+    "text-green-500",
+    "hover:bg-green-900/20",
+    "hover:text-green-500",
+    "bg-green-500",
+    "bg-blue-900/20",
+    "text-blue-500",
+    "hover:bg-blue-900/20",
+    "hover:text-blue-500",
+    "bg-blue-500",
+    "bg-purple-900/20",
+    "text-purple-500",
+    "hover:bg-purple-900/20",
+    "hover:text-purple-500",
+    "bg-purple-500",
+    "bg-yellow-900/20",
+    "text-yellow-500",
+    "hover:bg-yellow-900/20",
+    "hover:text-yellow-500",
+    "bg-yellow-500",
+    "bg-orange-900/20",
+    "text-orange-500",
+    "hover:bg-orange-900/20",
+    "hover:text-orange-500",
+    "bg-orange-500",
+    "bg-pink-900/20",
+    "text-pink-500",
+    "hover:bg-pink-900/20",
+    "hover:text-pink-500",
+    "bg-pink-500",
+    "bg-red-900/20",
+    "text-red-500",
+    "hover:bg-red-900/20",
+    "hover:text-red-500",
+    "bg-red-500",
+    "bg-sky-900/20",
+    "text-sky-500",
+    "hover:bg-sky-900/20",
+    "hover:text-sky-500",
+    "bg-sky-500",
+    "bg-teal-900/20",
+    "text-teal-500",
+    "hover:bg-teal-900/20",
+    "hover:text-teal-500",
+    "bg-teal-500",
+  ],
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -231,6 +331,40 @@ const config = {
   ],
   theme: {
     colors: {
+      gray: {
+        "0": "hsl(var(--gray-0))",
+        "50": "hsl(var(--gray-50))",
+        "100": "hsl(var(--gray-100))",
+        "200": "hsl(var(--gray-200))",
+        "300": "hsl(var(--gray-300))",
+        "400": "hsl(var(--gray-400))",
+        "500": "hsl(var(--gray-500))",
+        "600": "hsl(var(--gray-600))",
+        "700": "hsl(var(--gray-700))",
+        "800": "hsl(var(--gray-800))",
+        "900": "hsl(var(--gray-900))",
+        "950": "hsl(var(--gray-950))",
+        "alpha-24": "hsl(var(--gray-alpha-24))",
+        "alpha-16": "hsl(var(--gray-alpha-16))",
+        "alpha-10": "hsl(var(--gray-alpha-10))",
+      },
+      slate: {
+        "0": "hsl(var(--slate-0))",
+        "50": "hsl(var(--slate-50))",
+        "100": "hsl(var(--slate-100))",
+        "200": "hsl(var(--slate-200))",
+        "300": "hsl(var(--slate-300))",
+        "400": "hsl(var(--slate-400))",
+        "500": "hsl(var(--slate-500))",
+        "600": "hsl(var(--slate-600))",
+        "700": "hsl(var(--slate-700))",
+        "800": "hsl(var(--slate-800))",
+        "900": "hsl(var(--slate-900))",
+        "950": "hsl(var(--slate-950))",
+        "alpha-24": "hsl(var(--slate-alpha-24))",
+        "alpha-16": "hsl(var(--slate-alpha-16))",
+        "alpha-10": "hsl(var(--slate-alpha-10))",
+      },
       neutral: {
         "0": "hsl(var(--neutral-0))",
         "50": "hsl(var(--neutral-50))",
@@ -506,13 +640,6 @@ const config = {
         amazon: "hsl(var(--social-amazon))",
         zendesk: "hsl(var(--social-zendesk))",
       },
-      illustration: {
-        "white-0": "hsl(var(--illustration-white-0))",
-        "weak-100": "hsl(var(--illustration-weak-100))",
-        "soft-200": "hsl(var(--illustration-soft-200))",
-        "sub-300": "hsl(var(--illustration-sub-300))",
-        "strong-400": "hsl(var(--illustration-strong-400))",
-      },
       overlay: {
         DEFAULT: "hsl(var(--overlay))",
       },
@@ -528,33 +655,24 @@ const config = {
       none: defaultTheme.boxShadow.none,
     },
     extend: {
-      fontFamily: {
-        sans: ["var(--font-sans)"],
-        mono: ["var(--font-mono)"],
-      },
       borderRadius: {
         ...borderRadii,
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 3s ease-in-out infinite",
+        scroll:
+          "scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        float: "float 6s ease-in-out infinite",
       },
       keyframes: {
-        shimmer: {
-          "0%": {
-            backgroundPosition: "200% 0",
-          },
-          "100%": {
-            backgroundPosition: "-200% 0",
-          },
-        },
         "accordion-down": {
           from: { height: "0", opacity: "0" },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-            opacity: "1",
-          },
+          to: { height: "var(--radix-accordion-content-height)", opacity: "1" },
         },
         "accordion-up": {
           from: {
@@ -563,10 +681,30 @@ const config = {
           },
           to: { height: "0", opacity: "0" },
         },
+        scroll: {
+          to: {
+            transform: "translate(calc(-50% - 0.5rem))",
+          },
+        },
+        "pulse-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 20px rgba(59, 130, 246, 0.4)",
+            transform: "scale(1)",
+          },
+          "50%": {
+            boxShadow:
+              "0 0 40px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.3)",
+            transform: "scale(1.02)",
+          },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
       },
     },
   },
-  plugins: [tailwindcssAnimate, scrollbarHide],
+  plugins: [tailwindcssAnimate, tailwindcssTypography, tailwindScrollbarHide],
 } satisfies Config;
 
 export default config;
