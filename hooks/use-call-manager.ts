@@ -25,7 +25,7 @@ export function useCallManager({
     if (!isConnected) {
       // Check if user is authenticated
       if (!userId) {
-        toast.error("Please sign in to use the AI assistant");
+        // Don't show toast - let the LoginPromptCard handle this
         return;
       }
 
@@ -58,9 +58,14 @@ export function useCallManager({
     setShowEndConversationDialog(false);
   }, []);
 
+  const handleEndConversation = useCallback(() => {
+    setShowEndConversationDialog(false);
+  }, []);
+
   return {
     showEndConversationDialog,
     toggleListening,
     handleContinueConversation,
+    handleEndConversation,
   };
 }

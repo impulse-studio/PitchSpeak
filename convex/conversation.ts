@@ -39,9 +39,9 @@ export const summarizeConversation = action({
       .map((t) => `${t.role === "user" ? "User" : "Assistant"}: ${t.text}`)
       .join("\n");
 
-    // Generate the summary using AI SDK v5
+    // Generate the summary using AI SDK
     const { text } = await generateText({
-      model: openai("gpt-5-mini"),
+      model: openai("gpt-4o-mini"),
       prompt: `Analyze this conversation between a user and an AI assistant about a project.
 
 Conversation:
@@ -72,7 +72,21 @@ Respond ONLY with valid JSON, no additional text.`,
       }
 
       const summary = JSON.parse(cleanedText);
-      return summary;
+
+      // Filter out null values from optional fields to match Convex validators
+      const estimation = summary.estimation || {};
+      const cleanedEstimation = {
+        features: estimation.features || [],
+        ...(estimation.timeframe && { timeframe: estimation.timeframe }),
+        ...(estimation.complexity && { complexity: estimation.complexity }),
+        ...(estimation.cost && { cost: estimation.cost }),
+      };
+
+      return {
+        projectSummary: summary.projectSummary || "",
+        estimation: cleanedEstimation,
+        fullSummary: summary.fullSummary || "",
+      };
     } catch (error) {
       throw new Error(`Failed to parse AI response: ${text}`);
     }

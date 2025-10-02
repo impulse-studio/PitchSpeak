@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Transcript } from "@/types/transcript";
@@ -20,25 +20,61 @@ export function useConversationSummary() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [summary, setSummary] = useState<ConversationSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const summarizeAction = useAction(api.conversation.summarizeConversation);
 
-  const generateSummary = async (transcripts: Transcript[]) => {
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const generateSummary = useCallback(async (transcripts: Transcript[]) => {
     setIsGenerating(true);
     setError(null);
+    setProgress(0);
+
+    // Start progress simulation
+    const startTime = Date.now();
+    const estimatedDuration = 8000; // 8 seconds estimated
+
+    progressIntervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const calculatedProgress = Math.min(95, (elapsed / estimatedDuration) * 100);
+      setProgress(calculatedProgress);
+    }, 100);
 
     try {
       const result = await summarizeAction({ transcripts });
+
+      // Clear interval and set to 100%
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+
+      setProgress(100);
       setSummary(result);
       return result;
     } catch (err) {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      setProgress(0);
       const errorMessage = err instanceof Error ? err.message : "Failed to generate summary";
       setError(errorMessage);
       throw err;
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [summarizeAction]);
 
   const downloadPDF = async (summary: ConversationSummary) => {
     try {
@@ -79,6 +115,7 @@ export function useConversationSummary() {
     isGenerating,
     summary,
     error,
+    progress,
     generateSummary,
     downloadPDF,
   };

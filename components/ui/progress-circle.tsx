@@ -16,6 +16,9 @@ export const progressCircleVariants = tv({
       "64": { text: "text-label-sm" },
       "56": { text: "text-label-xs" },
       "48": { text: "text-label-xs" },
+      "32": { text: "text-label-xs" },
+      "24": { text: "text-label-xs" },
+      "20": { text: "text-label-xs" },
     },
   },
   defaultVariants: {
@@ -51,6 +54,21 @@ function getSizes({
       return {
         strokeWidth: 6.7,
         radius: 24,
+      };
+    case "32":
+      return {
+        strokeWidth: 3,
+        radius: 16,
+      };
+    case "24":
+      return {
+        strokeWidth: 2.5,
+        radius: 12,
+      };
+    case "20":
+      return {
+        strokeWidth: 2,
+        radius: 10,
       };
     default:
       return {
