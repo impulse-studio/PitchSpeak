@@ -29,7 +29,6 @@ export default function VoiceEstimationTool() {
   const {
     isListening,
     isResponding,
-    audioLevel,
     isConnected,
     isConnecting,
     startCall,
@@ -52,6 +51,7 @@ export default function VoiceEstimationTool() {
     showEndConversationDialog,
     toggleListening,
     handleContinueConversation,
+    handleEndConversation: closeEndDialog,
   } = useCallManager({
     userId,
     isConnected,
@@ -62,20 +62,31 @@ export default function VoiceEstimationTool() {
     },
   });
 
-  const { isSaving, handleEndConversation } = useConversationSave({
+  const {
+    isSaving,
+    isGeneratingDocument,
+    generationProgress,
+    handleEndConversation: saveConversation,
+  } = useConversationSave({
     stopCall,
     transcripts,
   });
+
+  const handleEndConversation = useCallback(async () => {
+    closeEndDialog();
+    await saveConversation();
+  }, [closeEndDialog, saveConversation]);
 
   return (
     <ConversationInterface
       isListening={isListening}
       isResponding={isResponding}
-      audioLevel={audioLevel}
-      isInConversation={isConnected}
+      isInConversation={isConnected || isGeneratingDocument}
       isConnecting={isConnecting}
       showEndConversationDialog={showEndConversationDialog}
       isSaving={isSaving}
+      isGeneratingDocument={isGeneratingDocument}
+      generationProgress={generationProgress}
       onToggleListening={toggleListening}
       onEndConversation={handleEndConversation}
       onContinueConversation={handleContinueConversation}

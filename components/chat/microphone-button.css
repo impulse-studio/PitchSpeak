@@ -1,0 +1,109 @@
+/* LIQUID GLASS STYLES */
+
+.liquidGlass-wrapper {
+  position: relative;
+  display: flex;
+  font-weight: 600;
+  overflow: hidden;
+
+  color: black;
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 6px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(0, 0, 0, 0.1);
+
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.liquidGlass-effect {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  backdrop-filter: blur(3px);
+  filter: url(#glass-distortion);
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.liquidGlass-tint {
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+}
+
+.liquidGlass-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  overflow: hidden;
+
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+}
+
+.liquidGlass-text {
+  z-index: 3;
+  font-size: 2rem;
+  color: black;
+  pointer-events: none;
+}
+
+.mic-button {
+  padding: 2rem;
+  border-radius: 50%;
+  border: none;
+  background: url("/aurora.jpg") center center;
+  background-size: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 65px;
+  height: 65px;
+  animation: moveBackground 60s linear infinite;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.mic-button.in-conversation:not(.listening) {
+  background: url("/inferno.jpg") center center;
+  background-size: 100px;
+  animation: moveBackground 60s linear infinite;
+}
+
+.mic-button,
+.mic-button > div {
+  border-radius: 50%;
+}
+
+.mic-button:hover {
+  padding: 2.5rem;
+}
+
+.mic-button:hover > div {
+  border-radius: 50%;
+}
+
+.mic-button svg {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+  color: white;
+}
+
+.mic-button:hover svg {
+  transform: scale(0.9);
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -500%;
+  }
+}

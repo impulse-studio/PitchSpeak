@@ -17,8 +17,9 @@ export function useConversationSave({
 }: UseConversationSaveProps) {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [isGeneratingDocument, setIsGeneratingDocument] = useState(false);
 
-  const { generateSummary } = useConversationSummary();
+  const { generateSummary, progress } = useConversationSummary();
   const saveConversation = useMutation(
     api.conversationQueries.saveConversationSummary
   );
@@ -26,9 +27,11 @@ export function useConversationSave({
   const handleEndConversation = useCallback(async () => {
     stopCall();
     setIsSaving(true);
+    setIsGeneratingDocument(true);
 
     if (transcripts.length === 0) {
       setIsSaving(false);
+      setIsGeneratingDocument(false);
       return;
     }
 
@@ -47,11 +50,14 @@ export function useConversationSave({
       console.error("Failed to process conversation:", error);
       toast.error("Failed to save conversation. Please try again.");
       setIsSaving(false);
+      setIsGeneratingDocument(false);
     }
   }, [stopCall, transcripts, generateSummary, saveConversation, router]);
 
   return {
     isSaving,
+    isGeneratingDocument,
+    generationProgress: progress,
     handleEndConversation,
   };
 }
