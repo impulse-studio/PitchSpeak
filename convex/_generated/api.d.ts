@@ -26,6 +26,7 @@ import type * as emails_twoFactorOtp from "../emails/twoFactorOtp.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_waitlistApproved from "../emails/waitlistApproved.js";
 import type * as http from "../http.js";
+import type * as rateLimit from "../rateLimit.js";
 
 import type {
   ApiFromModules,
@@ -60,6 +61,7 @@ declare const fullApi: ApiFromModules<{
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/waitlistApproved": typeof emails_waitlistApproved;
   http: typeof http;
+  rateLimit: typeof rateLimit;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

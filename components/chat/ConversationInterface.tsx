@@ -21,6 +21,9 @@ interface ConversationInterfaceProps {
   onToggleListening: () => void;
   onEndConversation: () => void;
   onContinueConversation: () => void;
+  remainingCalls: number | null;
+  resetTime: number | null;
+  isAuthenticated: boolean;
 }
 
 export default function ConversationInterface({
@@ -33,8 +36,12 @@ export default function ConversationInterface({
   onToggleListening,
   onEndConversation,
   onContinueConversation,
+  remainingCalls,
+  resetTime,
+  isAuthenticated,
 }: ConversationInterfaceProps) {
   const [showMicrophone, setShowMicrophone] = useState(true);
+  const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +56,37 @@ export default function ConversationInterface({
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!resetTime) {
+      setTimeRemaining("");
+      return;
+    }
+
+    const updateTimeRemaining = () => {
+      const now = Date.now();
+      const diff = resetTime - now;
+
+      if (diff <= 0) {
+        setTimeRemaining("");
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (hours > 0) {
+        setTimeRemaining(`Resets in ${hours}h ${minutes}m`);
+      } else {
+        setTimeRemaining(`Resets in ${minutes}m`);
+      }
+    };
+
+    updateTimeRemaining();
+    const interval = setInterval(updateTimeRemaining, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [resetTime]);
 
   useEffect(() => {
     let audio: HTMLAudioElement | null = null;
@@ -177,15 +215,33 @@ export default function ConversationInterface({
           showMicrophone ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <Button.Root
-          onClick={onToggleListening}
-          disabled={isSaving}
-          size="xsmall"
-          className="rounded-full h-14 w-14 transition-all duration-300 backdrop-blur-2xl relative overflow-hidden hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            background: isInConversation
-              ? isListening
-                ? `linear-gradient(135deg,
+        <div className="flex flex-col items-center gap-3">
+          {isAuthenticated && remainingCalls !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center gap-1"
+            >
+              <div className="text-white/60 text-sm font-medium backdrop-blur-sm bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                {remainingCalls} call{remainingCalls !== 1 ? "s" : ""} remaining
+                today
+              </div>
+              {remainingCalls === 0 && timeRemaining && (
+                <div className="text-white/40 text-xs font-medium">
+                  {timeRemaining}
+                </div>
+              )}
+            </motion.div>
+          )}
+          <Button.Root
+            onClick={onToggleListening}
+            disabled={isSaving || (isAuthenticated && remainingCalls === 0)}
+            size="xsmall"
+            className="rounded-full h-14 w-14 transition-all duration-300 backdrop-blur-2xl relative overflow-hidden hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              background: isInConversation
+                ? isListening
+                  ? `linear-gradient(135deg,
                     rgba(0, 0, 0, 0.1) 0%,
                     rgba(239, 68, 68, 0.05) 20%,
                     rgba(0, 0, 0, 0.3) 60%,
@@ -193,7 +249,7 @@ export default function ConversationInterface({
                    radial-gradient(circle at 30% 20%,
                     rgba(255, 255, 255, 0.2) 0%,
                     transparent 50%)`
-                : `linear-gradient(135deg,
+                  : `linear-gradient(135deg,
                       rgba(239, 68, 68, 0.1) 0%,
                       rgba(239, 68, 68, 0.05) 20%,
                       rgba(0, 0, 0, 0.3) 60%,
@@ -201,7 +257,7 @@ export default function ConversationInterface({
                      radial-gradient(circle at 30% 20%,
                       rgba(239, 68, 68, 0.2) 0%,
                       transparent 50%)`
-              : `linear-gradient(135deg,
+                : `linear-gradient(135deg,
                   rgba(255, 255, 255, 0.1) 0%,
                   rgba(255, 255, 255, 0.05) 20%,
                   rgba(0, 0, 0, 0.3) 60%,
@@ -209,12 +265,12 @@ export default function ConversationInterface({
                  radial-gradient(circle at 30% 20%,
                   rgba(255, 255, 255, 0.3) 0%,
                   transparent 50%)`,
-            border: isInConversation
-              ? "1px solid rgba(239, 68, 68, 0.3)"
-              : "1px solid rgba(255, 255, 255, 0.2)",
-            boxShadow: isInConversation
-              ? isListening
-                ? `
+              border: isInConversation
+                ? "1px solid rgba(239, 68, 68, 0.3)"
+                : "1px solid rgba(255, 255, 255, 0.2)",
+              boxShadow: isInConversation
+                ? isListening
+                  ? `
                   inset 0 1px 2px rgba(255, 255, 255, 0.25),
                   inset 0 -1px 1px rgba(0, 0, 0, 0.6),
                   0 2px 4px rgba(0, 0, 0, 0.9),
@@ -224,7 +280,7 @@ export default function ConversationInterface({
                   0 0 20px rgba(239, 68, 68, 0.4),
                   0 0 40px rgba(239, 68, 68, 0.2)
                 `
-                : `
+                  : `
                   inset 0 1px 2px rgba(255, 255, 255, 0.2),
                   inset 0 -1px 1px rgba(0, 0, 0, 0.6),
                   0 2px 4px rgba(0, 0, 0, 0.9),
@@ -234,7 +290,7 @@ export default function ConversationInterface({
                   0 0 20px rgba(239, 68, 68, 0.3),
                   0 0 40px rgba(239, 68, 68, 0.15)
                 `
-              : `
+                : `
                 inset 0 1px 2px rgba(255, 255, 255, 0.3),
                 inset 0 -1px 1px rgba(0, 0, 0, 0.6),
                 0 2px 4px rgba(0, 0, 0, 0.9),
@@ -244,30 +300,31 @@ export default function ConversationInterface({
                 0 0 20px rgba(255, 255, 255, 0.1),
                 0 0 40px rgba(255, 255, 255, 0.05)
               `,
-            color: isInConversation
-              ? "rgba(239, 68, 68, 1)"
-              : "rgba(255, 255, 255, 0.9)",
-            cursor: "pointer",
-          }}
-        >
-          {isConnecting ? (
-            <motion.div
-              animate={{
-                rotate: [0, -15, 15, -15, 15, 0],
-                scale: [1, 1.1, 0.9, 1.1, 0.9, 1],
-              }}
-              transition={{
-                duration: 0.5,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "easeInOut",
-              }}
-            >
-              <Phone className="h-5 w-5" />
-            </motion.div>
-          ) : (
-            <Button.Icon as={isInConversation ? MicOff : Mic} />
-          )}
-        </Button.Root>
+              color: isInConversation
+                ? "rgba(239, 68, 68, 1)"
+                : "rgba(255, 255, 255, 0.9)",
+              cursor: "pointer",
+            }}
+          >
+            {isConnecting ? (
+              <motion.div
+                animate={{
+                  rotate: [0, -15, 15, -15, 15, 0],
+                  scale: [1, 1.1, 0.9, 1.1, 0.9, 1],
+                }}
+                transition={{
+                  duration: 0.5,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                }}
+              >
+                <Phone className="h-5 w-5" />
+              </motion.div>
+            ) : (
+              <Button.Icon as={isInConversation ? MicOff : Mic} />
+            )}
+          </Button.Root>
+        </div>
       </div>
 
       {!isInConversation && (

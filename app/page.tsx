@@ -1,23 +1,30 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import ConversationInterface from "@/components/chat/ConversationInterface";
-import { api } from "@/convex/_generated/api";
-import { useConversationSummary } from "@/hooks/use-conversation-summary";
+import { useCallManager } from "@/hooks/use-call-manager";
+import { useConversationSave } from "@/hooks/use-conversation-save";
+import { useRateLimit } from "@/hooks/use-rate-limit";
 import { useVapi } from "@/hooks/use-vapi";
+import { authClient } from "@/lib/auth/client";
 
 export default function VoiceEstimationTool() {
-  const router = useRouter();
-  const [showEndConversationDialog, setShowEndConversationDialog] =
-    useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const session = authClient.useSession();
+  const userId = session.data?.user?.id;
 
-  const { generateSummary } = useConversationSummary();
-  const saveConversation = useMutation(
-    api.conversationQueries.saveConversationSummary
-  );
+  const [remainingCalls, setRemainingCalls] = useState<number | null>(null);
+  const [resetTime, setResetTime] = useState<number | null>(null);
+
+  const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+  if (!assistantId) {
+    throw new Error("Configuration error: Missing assistant ID");
+  }
+
+  const handleVapiError = useCallback((error: Error) => {
+    console.error("Vapi error:", error);
+    toast.error("Voice assistant error. Please try again.");
+  }, []);
 
   const {
     isListening,
@@ -29,53 +36,36 @@ export default function VoiceEstimationTool() {
     stopCall,
     transcripts,
   } = useVapi({
-    assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID,
-    onCallEnd: () => {
-      setShowEndConversationDialog(false);
-    },
-    onError: (error) => {
-      console.error("Vapi error:", error);
+    assistantId,
+    onCallEnd: () => {},
+    onError: handleVapiError,
+  });
+
+  const rateLimitState = useRateLimit(userId);
+
+  if (rateLimitState.remaining !== null && remainingCalls === null) {
+    setRemainingCalls(rateLimitState.remaining);
+    setResetTime(rateLimitState.reset);
+  }
+
+  const {
+    showEndConversationDialog,
+    toggleListening,
+    handleContinueConversation,
+  } = useCallManager({
+    userId,
+    isConnected,
+    startCall,
+    onRateLimitUpdate: (remaining, reset) => {
+      setRemainingCalls(remaining);
+      setResetTime(reset);
     },
   });
 
-  const toggleListening = () => {
-    if (!isConnected) {
-      startCall();
-    } else {
-      setShowEndConversationDialog(true);
-    }
-  };
-
-  const handleEndConversation = async () => {
-    stopCall();
-    setShowEndConversationDialog(false);
-    setIsSaving(true);
-
-    if (transcripts.length > 0) {
-      try {
-        const summary = await generateSummary(transcripts);
-
-        const conversationId = await saveConversation({
-          projectSummary: summary.projectSummary,
-          estimation: summary.estimation,
-          fullSummary: summary.fullSummary,
-          transcripts: transcripts,
-        });
-
-        router.push(`/summary?id=${conversationId}`);
-      } catch (error) {
-        console.error("❌ Failed to process conversation:", error);
-        alert("Failed to save conversation. Please try again.");
-        setIsSaving(false);
-      }
-    } else {
-      setIsSaving(false);
-    }
-  };
-
-  const handleContinueConversation = () => {
-    setShowEndConversationDialog(false);
-  };
+  const { isSaving, handleEndConversation } = useConversationSave({
+    stopCall,
+    transcripts,
+  });
 
   return (
     <ConversationInterface
@@ -89,6 +79,9 @@ export default function VoiceEstimationTool() {
       onToggleListening={toggleListening}
       onEndConversation={handleEndConversation}
       onContinueConversation={handleContinueConversation}
+      remainingCalls={remainingCalls}
+      resetTime={resetTime}
+      isAuthenticated={!!userId}
     />
   );
 }
