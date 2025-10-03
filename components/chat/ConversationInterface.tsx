@@ -1,5 +1,7 @@
 "use client";
 
+import type Vapi from "@vapi-ai/web";
+import { Keyboard, Mic, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -9,6 +11,8 @@ import DocumentGenerationLoader from "@/components/chat/DocumentGenerationLoader
 import { LoginPromptCard } from "@/components/chat/LoginPromptCard";
 import { MicrophoneButton } from "@/components/chat/MicrophoneButton";
 import EndConversationDialog from "@/components/common/EndConversationDialog";
+import * as Button from "@/components/ui/button";
+import * as Switch from "@/components/ui/switch";
 import BackgroundPulse from "@/components/visualization/background-pulse";
 import VoxelSphere from "@/components/visualization/voxel-sphere";
 import {
@@ -18,6 +22,7 @@ import {
   SCROLL_THRESHOLD,
   TIME_UPDATE_INTERVAL,
 } from "@/constants/chat";
+import type { Transcript } from "@/types/transcript";
 
 interface ConversationInterfaceProps {
   isListening: boolean;
@@ -38,6 +43,8 @@ interface ConversationInterfaceProps {
   remainingCalls: number | null;
   resetTime: number | null;
   isAuthenticated: boolean;
+  vapi: Vapi | null;
+  transcripts: Transcript[];
 }
 
 const formatTimeRemaining = (milliseconds: number): string => {
@@ -76,14 +83,37 @@ export default function ConversationInterface({
   remainingCalls,
   resetTime,
   isAuthenticated,
+  vapi,
+  transcripts,
 }: ConversationInterfaceProps) {
   const router = useRouter();
   const [showMicrophone, setShowMicrophone] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState<string>("");
+  const [inputMode, setInputMode] = useState<"voice" | "text">("voice");
+  const [textInput, setTextInput] = useState("");
 
   const handleLoginClick = useCallback(() => {
     router.push("/sign-in");
   }, [router]);
+
+  const handleSendTextMessage = useCallback(() => {
+    if (!textInput.trim() || !vapi) return;
+
+    try {
+      vapi.send({
+        type: "add-message",
+        message: {
+          role: "user",
+          content: textInput,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to send message to Vapi:", error);
+    }
+
+    // Clear input
+    setTextInput("");
+  }, [textInput, vapi]);
 
   const updateMicrophoneVisibility = useCallback(() => {
     if (isInConversation) {
@@ -275,28 +305,28 @@ export default function ConversationInterface({
       </main>
 
       <div
-        className={`fixed bottom-16 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${
+        className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 transition-opacity duration-500 ease-in-out ${
           showMicrophone ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
         <div className="flex flex-col items-center gap-3">
-          {isAuthenticated && remainingCalls !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center gap-1"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-1"
+          >
+            {isAuthenticated && remainingCalls !== 0 && (
               <div className="text-white/60 text-sm font-medium backdrop-blur-sm bg-black/20 px-4 py-2 rounded-full border border-white/10">
                 {remainingCalls} call{remainingCalls !== 1 ? "s" : ""} remaining
                 today
               </div>
-              {remainingCalls === 0 && timeRemaining && (
-                <div className="text-white/40 text-xs font-medium">
-                  {timeRemaining}
-                </div>
-              )}
-            </motion.div>
-          )}
+            )}
+            {remainingCalls === 0 && timeRemaining && (
+              <div className="text-white/40 text-xs font-medium">
+                {timeRemaining}
+              </div>
+            )}
+          </motion.div>
 
           {!isAuthenticated && !isInConversation ? (
             <LoginPromptCard
@@ -307,7 +337,9 @@ export default function ConversationInterface({
                   isListening={isListening}
                   isConnecting={isConnecting}
                   isSaving={isSaving}
-                  isDisabled={isAuthenticated && remainingCalls === 0}
+                  isDisabled={
+                    isAuthenticated && remainingCalls === 0 && !isInConversation
+                  }
                 />
               }
             />
@@ -317,10 +349,35 @@ export default function ConversationInterface({
               isListening={isListening}
               isConnecting={isConnecting}
               isSaving={isSaving}
-              isDisabled={isAuthenticated && remainingCalls === 0}
+              isDisabled={
+                isAuthenticated && remainingCalls === 0 && !isInConversation
+              }
               onClick={onToggleListening}
             />
           )}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 backdrop-blur-sm border border-white/10"
+          >
+            <Mic
+              className={`size-4 transition-colors ${
+                inputMode === "voice" ? "text-blue-400" : "text-white/40"
+              }`}
+            />
+            <Switch.Root
+              checked={inputMode === "text"}
+              onCheckedChange={(checked) =>
+                setInputMode(checked ? "text" : "voice")
+              }
+            />
+            <Keyboard
+              className={`w-4 h-4 transition-colors ${
+                inputMode === "text" ? "text-blue-400" : "text-white/40"
+              }`}
+            />
+          </motion.div>
         </div>
       </div>
 
@@ -329,6 +386,81 @@ export default function ConversationInterface({
           <Footer />
         </div>
       )}
+
+      <motion.div
+        initial={{ x: -400, opacity: 0 }}
+        animate={{
+          x: isInConversation && inputMode === "text" ? 0 : -400,
+          opacity: isInConversation && inputMode === "text" ? 1 : 0,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+        }}
+        className="fixed top-[5%] -translate-y-1/2 w-96 h-[90%] bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+        style={{
+          left: "calc(5%)",
+        }}
+      >
+        <div className="px-6 py-4 border-b border-white/10">
+          <h3 className="text-lg font-semibold text-white">Conversation</h3>
+          <p className="text-sm text-white/60 mt-1">Type your message below</p>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scrollbar-hide">
+          {transcripts.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-white/40 text-sm text-center">
+                No messages yet.
+                <br />
+                Start typing to begin the conversation.
+              </p>
+            </div>
+          ) : (
+            transcripts.map((transcript, index) => (
+              <div
+                key={index}
+                className={`flex ${transcript.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[80%] px-4 py-2 rounded-2xl ${
+                    transcript.role === "user"
+                      ? "bg-blue-500 text-white"
+                      : "bg-white/10 text-white"
+                  }`}
+                >
+                  <p className="text-sm">{transcript.text}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="px-6 py-4 border-t border-white/10">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={textInput}
+              onChange={(e) => setTextInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendTextMessage();
+                }
+              }}
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <Button.Root
+              onClick={handleSendTextMessage}
+              disabled={!textInput.trim()}
+              className="flex items-center justify-center w-12 h-12 bg-purple-500 hover:bg-purple-600 disabled:bg-white/10 disabled:cursor-not-allowed rounded-xl transition-colors"
+            >
+              <Send className="size-5 text-white" />
+            </Button.Root>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
