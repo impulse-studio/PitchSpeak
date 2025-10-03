@@ -38,22 +38,20 @@ export function useVapi({
       return;
     }
 
-    // Only initialize once
     if (vapiRef.current) {
       return;
     }
 
-    // Initialize Vapi instance
     vapiRef.current = new Vapi(publicKey);
 
-    // Setup event listeners
     const vapi = vapiRef.current;
 
     vapi.on("call-start", () => {
       setIsConnecting(false);
       setIsConnected(true);
-      setIsResponding(true); // AI starts speaking first
+      setIsResponding(true);
       setIsListening(false);
+      setTranscripts([]);
       onCallStart?.();
     });
 
@@ -79,7 +77,6 @@ export function useVapi({
     });
 
     vapi.on("message", (message) => {
-      // User starts speaking
       if (
         message.type === "speech-update" &&
         message.status === "started" &&
@@ -158,7 +155,6 @@ export function useVapi({
       return;
     }
 
-    // Request microphone permissions first
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (error) {

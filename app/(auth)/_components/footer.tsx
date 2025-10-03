@@ -12,15 +12,7 @@ export default function Footer({ className = "" }: FooterProps) {
     <footer
       className={`relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 ${className}`}
     >
-      {/* Background with particles effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-purple-400/20 rounded-full animate-pulse" />
-        <div className="absolute top-1/2 right-1/3 w-1 h-1 bg-blue-400/30 rounded-full animate-pulse delay-1000" />
-        <div className="absolute bottom-1/3 left-1/2 w-1 h-1 sm:w-1.5 sm:h-1.5 bg-pink-400/20 rounded-full animate-pulse delay-500" />
-      </div>
-
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Main Footer Content */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -29,7 +21,6 @@ export default function Footer({ className = "" }: FooterProps) {
           className="bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-3xl border border-white/[0.08] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.4)] before:absolute before:inset-0 before:rounded-2xl sm:before:rounded-3xl before:bg-gradient-to-br before:from-white/[0.05] before:to-transparent before:pointer-events-none relative overflow-hidden"
         >
           <div className="relative z-10">
-            {/* Brand Section */}
             <div className="text-center sm:text-left mb-8">
               <div className="flex items-center gap-3 mb-4 sm:mb-6 justify-center sm:justify-start">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center">

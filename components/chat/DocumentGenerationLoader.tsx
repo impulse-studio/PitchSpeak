@@ -19,7 +19,7 @@ export default function DocumentGenerationLoader({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 10 }}
       transition={{ duration: 0.5 }}
-      className="absolute top-full left-0 right-0 -mt-32 flex justify-center"
+      className="absolute top-full left-0 right-0 -mt-44 flex justify-center"
     >
       <div className="flex items-center justify-center gap-4 px-12 py-4 bg-gradient-to-br from-white/[0.08] to-white/[0.03] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] w-auto">
         <span className="relative inline-block text-neutral-500 text-base font-medium tracking-tight whitespace-nowrap">
