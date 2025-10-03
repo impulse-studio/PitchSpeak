@@ -14,7 +14,7 @@ export function LoginPromptCard({
   onLoginClick,
   triggerElement,
 }: LoginPromptCardProps) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Popover.Root open={isOpen} onOpenChange={setIsOpen} modal={false}>

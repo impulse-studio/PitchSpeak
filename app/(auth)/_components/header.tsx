@@ -32,16 +32,20 @@ export default function Header() {
             >
               Home
             </Link>
-            <Link
-              href="/summary"
-              className="text-white/70 hover:text-white/90 text-sm font-medium tracking-tight transition-colors duration-200"
-            >
-              Summary
-            </Link>
+            {session.data?.user && (
+              <Link
+                href="/summary"
+                className="text-white/70 hover:text-white/90 text-sm font-medium tracking-tight transition-colors duration-200"
+              >
+                Summary
+              </Link>
+            )}
           </div>
 
           <div className="ml-auto">
-            {session.data?.user ? (
+            {session.isPending ? (
+              <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
+            ) : session.data?.user ? (
               <HeaderDropdown user={session.data.user} />
             ) : (
               <div className="flex items-center gap-2">

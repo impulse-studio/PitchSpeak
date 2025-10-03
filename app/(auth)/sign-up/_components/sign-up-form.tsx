@@ -117,6 +117,7 @@ export function SignUpForm() {
             brand="github"
             className="w-full"
             mode="stroke"
+            type="button"
             onClick={() =>
               authClient.signIn.social({
                 provider: "github",

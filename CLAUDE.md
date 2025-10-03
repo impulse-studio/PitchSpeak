@@ -650,3 +650,72 @@ export default defineSchema({
   }).index("by_channel", ["channelId"]),
 });
 ```
+
+## Next.js + Convex Prefetch Guidelines
+
+### Why use `preloadQuery`?
+- By default, Next.js Client Components don’t block on Convex data and render in a "loading" state.
+- `preloadQuery` allows you to load data on the server (Server Components) and pass it to the client pre-hydrated.
+- This combines **fast server rendering** with **reactive real-time updates** once on the client.
+
+### Example: Server → Client Wrapper
+```ts
+// app/TasksWrapper.tsx (Server Component)
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+import { Tasks } from "./Tasks";
+
+export async function TasksWrapper() {
+  const preloadedTasks = await preloadQuery(api.tasks.list, {
+    list: "default",
+  });
+  return <Tasks preloadedTasks={preloadedTasks} />;
+}
+
+
+// app/Tasks.tsx (Client Component)
+"use client";
+
+import { Preloaded, usePreloadedQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+export function Tasks(props: {
+  preloadedTasks: Preloaded<typeof api.tasks.list>;
+}) {
+  const tasks = usePreloadedQuery(props.preloadedTasks);
+  return <div>{JSON.stringify(tasks)}</div>;
+}
+
+const token = await getAuthToken();
+const preloadedTasks = await preloadQuery(
+  api.tasks.list,
+  { list: "default" },
+  { token },
+);
+
+Key Points
+
+preloadQuery returns an opaque Preloaded payload. It must be passed to usePreloadedQuery in a Client Component.
+
+If you need to check the result before rendering a component, use preloadedQueryResult.
+
+preloadQuery always applies cache: 'no-store', so static rendering is disabled.
+
+For non-reactive data in Server Components, use fetchQuery instead.
+
+Server-side Authentication
+
+When your Convex deployment requires authentication, pass a JWT token:
+
+import { preloadQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
+
+export async function TasksWrapper() {
+  const token = await getAuthToken();
+  const preloadedTasks = await preloadQuery(
+    api.tasks.list,
+    { list: "default" },
+    { token },
+  );
+  return <Tasks preloadedTasks={preloadedTasks} />;
+}

@@ -45,6 +45,7 @@ interface ConversationInterfaceProps {
   isAuthenticated: boolean;
   vapi: Vapi | null;
   transcripts: Transcript[];
+  onAddTranscript?: (transcript: Transcript) => void;
 }
 
 const formatTimeRemaining = (milliseconds: number): string => {
@@ -85,6 +86,7 @@ export default function ConversationInterface({
   isAuthenticated,
   vapi,
   transcripts,
+  onAddTranscript,
 }: ConversationInterfaceProps) {
   const router = useRouter();
   const [showMicrophone, setShowMicrophone] = useState(true);
@@ -97,7 +99,7 @@ export default function ConversationInterface({
   }, [router]);
 
   const handleSendTextMessage = useCallback(() => {
-    if (!textInput.trim() || !vapi) return;
+    if (!textInput.trim() || !vapi || isResponding) return;
 
     try {
       vapi.send({
@@ -107,13 +109,19 @@ export default function ConversationInterface({
           content: textInput,
         },
       });
+
+      // Add the user message to transcripts manually since Vapi doesn't emit a transcript event for text messages
+      onAddTranscript?.({
+        role: "user",
+        text: textInput,
+        timestamp: Date.now(),
+      });
     } catch (error) {
       console.error("Failed to send message to Vapi:", error);
     }
 
-    // Clear input
     setTextInput("");
-  }, [textInput, vapi]);
+  }, [textInput, vapi, isResponding, onAddTranscript]);
 
   const updateMicrophoneVisibility = useCallback(() => {
     if (isInConversation) {
@@ -315,13 +323,15 @@ export default function ConversationInterface({
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center gap-1"
           >
-            {isAuthenticated && remainingCalls !== 0 && (
-              <div className="text-white/60 text-sm font-medium backdrop-blur-sm bg-black/20 px-4 py-2 rounded-full border border-white/10">
-                {remainingCalls} call{remainingCalls !== 1 ? "s" : ""} remaining
-                today
-              </div>
-            )}
-            {remainingCalls === 0 && timeRemaining && (
+            {isAuthenticated &&
+              remainingCalls !== null &&
+              remainingCalls > 0 && (
+                <div className="text-white/60 text-sm font-medium backdrop-blur-sm bg-black/20 px-4 py-2 rounded-full border border-white/10">
+                  {remainingCalls} call{remainingCalls !== 1 ? "s" : ""}{" "}
+                  remaining today
+                </div>
+              )}
+            {isAuthenticated && remainingCalls === 0 && timeRemaining && (
               <div className="text-white/40 text-xs font-medium">
                 {timeRemaining}
               </div>
@@ -443,7 +453,7 @@ export default function ConversationInterface({
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                if (e.key === "Enter" && !e.shiftKey && !isResponding) {
                   e.preventDefault();
                   handleSendTextMessage();
                 }
@@ -453,7 +463,7 @@ export default function ConversationInterface({
             />
             <Button.Root
               onClick={handleSendTextMessage}
-              disabled={!textInput.trim()}
+              disabled={!textInput.trim() || isResponding}
               className="flex items-center justify-center w-12 h-12 bg-purple-500 hover:bg-purple-600 disabled:bg-white/10 disabled:cursor-not-allowed rounded-xl transition-colors"
             >
               <Send className="size-5 text-white" />

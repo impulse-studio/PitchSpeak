@@ -186,6 +186,11 @@ export function useVapi({
     }
   }, [isConnected, startCall, stopCall]);
 
+  const addTranscript = useCallback((transcript: Transcript) => {
+    setTranscripts((prev) => [...prev, transcript]);
+    onTranscript?.(transcript);
+  }, [onTranscript]);
+
   return {
     isListening,
     isResponding,
@@ -197,5 +202,6 @@ export function useVapi({
     toggleCall,
     vapi: vapiRef.current,
     transcripts,
+    addTranscript,
   };
 }

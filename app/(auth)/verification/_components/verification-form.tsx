@@ -67,6 +67,7 @@ export function VerificationForm() {
           },
           onSuccess: () => {
             router.push(PAGES.LANDING_PAGE);
+            router.refresh();
           },
         }
       );
