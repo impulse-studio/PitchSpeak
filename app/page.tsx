@@ -35,6 +35,7 @@ export default function VoiceEstimationTool() {
     stopCall,
     transcripts,
     vapi,
+    addTranscript,
   } = useVapi({
     assistantId,
     onCallEnd: () => {},
@@ -96,6 +97,7 @@ export default function VoiceEstimationTool() {
       isAuthenticated={!!userId}
       vapi={vapi}
       transcripts={transcripts}
+      onAddTranscript={addTranscript}
     />
   );
 }

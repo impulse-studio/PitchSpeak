@@ -1,4 +1,5 @@
 import { mutation, query } from "./_generated/server";
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 
 /**
@@ -37,47 +38,26 @@ export const saveConversationSummary = mutation({
 });
 
 /**
- * Get all conversation summaries for a user (or all if no userId provided)
+ * Get all conversation summaries for a user (or all if no userId provided) with pagination
  */
 export const getConversationHistory = query({
   args: {
+    paginationOpts: paginationOptsValidator,
     userId: v.optional(v.string()),
   },
-  returns: v.array(
-    v.object({
-      _id: v.id("conversationSummaries"),
-      _creationTime: v.number(),
-      userId: v.optional(v.string()),
-      projectSummary: v.string(),
-      estimation: v.object({
-        timeframe: v.optional(v.string()),
-        complexity: v.optional(v.string()),
-        cost: v.optional(v.string()),
-        features: v.array(v.string()),
-      }),
-      fullSummary: v.string(),
-      transcripts: v.array(
-        v.object({
-          role: v.union(v.literal("user"), v.literal("assistant")),
-          text: v.string(),
-          timestamp: v.number(),
-        })
-      ),
-    })
-  ),
   handler: async (ctx, args) => {
     if (args.userId) {
       return await ctx.db
         .query("conversationSummaries")
         .withIndex("by_userId", (q) => q.eq("userId", args.userId))
         .order("desc")
-        .collect();
+        .paginate(args.paginationOpts);
     } else {
       // Get all conversations ordered by creation time (default order)
       return await ctx.db
         .query("conversationSummaries")
         .order("desc")
-        .collect();
+        .paginate(args.paginationOpts);
     }
   },
 });

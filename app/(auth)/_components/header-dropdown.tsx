@@ -2,12 +2,16 @@
 
 import type { User } from "better-auth";
 import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import * as Avatar from "@/components/ui/avatar";
 import * as DropdownMenu from "@/components/ui/dropdown";
+import { PAGES } from "@/constants/pages";
 import { authClient } from "@/lib/auth/client";
 
 export function HeaderDropdown({ user }: { user: User }) {
+  const router = useRouter();
+
   const getInitials = useCallback((name: string) => {
     return name
       .split(" ")
@@ -19,7 +23,9 @@ export function HeaderDropdown({ user }: { user: User }) {
 
   const handleSignOut = useCallback(async () => {
     await authClient.signOut();
-  }, []);
+    router.push(PAGES.SIGN_IN);
+    router.refresh();
+  }, [router]);
 
   return (
     <DropdownMenu.Root modal={false}>

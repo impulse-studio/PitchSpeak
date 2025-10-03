@@ -1,4 +1,4 @@
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
@@ -23,17 +23,23 @@ export function useConversationSave({
   const saveConversation = useMutation(
     api.conversationQueries.saveConversationSummary
   );
+  const currentUser = useQuery(api.auth.getCurrentUser);
 
   const handleEndConversation = useCallback(async () => {
     stopCall();
-    setIsSaving(true);
-    setIsGeneratingDocument(true);
 
     if (transcripts.length === 0) {
-      setIsSaving(false);
-      setIsGeneratingDocument(false);
       return;
     }
+
+    // Si l'utilisateur n'est pas connecté, on redirige vers la page d'accueil
+    if (!currentUser) {
+      router.push("/");
+      return;
+    }
+
+    setIsSaving(true);
+    setIsGeneratingDocument(true);
 
     try {
       const summary = await generateSummary(transcripts);
@@ -43,6 +49,7 @@ export function useConversationSave({
         estimation: summary.estimation,
         fullSummary: summary.fullSummary,
         transcripts,
+        userId: currentUser._id,
       });
 
       router.push(`/summary?id=${conversationId}`);
@@ -52,7 +59,7 @@ export function useConversationSave({
       setIsSaving(false);
       setIsGeneratingDocument(false);
     }
-  }, [stopCall, transcripts, generateSummary, saveConversation, router]);
+  }, [stopCall, transcripts, generateSummary, saveConversation, router, currentUser]);
 
   return {
     isSaving,
